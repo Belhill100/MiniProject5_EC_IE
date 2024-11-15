@@ -1,3 +1,8 @@
+import oscP5.*;
+import netP5.*;
+
+OscP5 oscP5;
+NetAddress dest;
 Table table;
 ArrayList<Movie> movies;
 int minYear = 1920;
@@ -7,6 +12,8 @@ int circleRadius = 10; // Radio de cada burbuja
 
 void setup() {
   size(1200, 600);
+  oscP5 = new OscP5(this, 12000); // Puerto de envío
+  dest = new NetAddress("127.0.0.1", 8000); // IP y puerto de PD
   table = loadTable("imdb_top_1000.csv", "header");
   movies = new ArrayList<Movie>();
 
@@ -31,7 +38,12 @@ void draw() {
     line(0, i, width, i);
   }
 
-  // Dibujar la línea de tiempo con marcas
+  // Dibujar las burbujas de películas
+  for (Movie movie : movies) {
+    movie.display();
+  }
+
+  // Dibujar la línea de tiempo con marcas encima de las burbujas
   stroke(200);
   strokeWeight(2);
   line(50, timelineY, width - 50, timelineY);
@@ -47,11 +59,6 @@ void draw() {
     }
   }
 
-  // Dibujar las burbujas de películas
-  for (Movie movie : movies) {
-    movie.display();
-  }
-
   // Mostrar información cuando el mouse esté sobre una burbuja
   for (Movie movie : movies) {
     if (movie.isMouseOver()) {
@@ -60,6 +67,7 @@ void draw() {
     }
   }
 }
+
 
 class Movie {
   String title;
